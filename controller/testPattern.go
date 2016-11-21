@@ -50,6 +50,6 @@ func (t *TestPatterns) Default() {
 		Duration: 1000,
 	}
 
-	append(*t, redFull, greenFull, blueFull, whiteFull, whiteHalf)
+	*t = append(*t, redFull, greenFull, blueFull, whiteFull, whiteHalf)
 
 }
