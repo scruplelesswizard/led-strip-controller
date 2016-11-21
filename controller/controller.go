@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi"
@@ -14,9 +15,9 @@ type Strip struct {
 	bPin  embd.PWMPin
 }
 
-const pinRed = "17"
-const pinGreen = "27"
-const pinBlue = "22"
+var pinRed = "P1_36"
+var pinGreen = "P1_38"
+var pinBlue = "P1_40"
 
 func NewStrip() (strip Strip) {
 
@@ -55,7 +56,7 @@ func NewStrip() (strip Strip) {
 
 	s.setPins()
 
-	return s, nil
+	return s
 
 }
 
@@ -65,15 +66,15 @@ func (s *Strip) SetColor(color RGB) {
 }
 
 func (s *Strip) setPins() {
-	if err := rPin.SetAnalog(s.Color.Red); err != nil {
+	if err := s.rPin.SetAnalog(s.Color.Red); err != nil {
 		panic(err)
 	}
 
-	if err := gPin.SetAnalog(s.Color.Green); err != nil {
+	if err := s.gPin.SetAnalog(s.Color.Green); err != nil {
 		panic(err)
 	}
 
-	if err := bPin.SetAnalog(s.Color.Blue); err != nil {
+	if err := s.bPin.SetAnalog(s.Color.Blue); err != nil {
 		panic(err)
 	}
 }
@@ -91,15 +92,15 @@ func (s *Strip) TestStrip() {
 
 	println("Starting Test")
 
-	test := TestPatterns
+	var test TestPatterns
 	test.Default()
 
 	for _, v := range test {
 		fmt.Printf("Starting Test %s", v.Name)
 		s.SetColor(v.Color)
-		time.sleep(v.Duration * time.Millisecond)
+		time.Sleep(time.Duration(v.Duration) * time.Millisecond)
 		s.Off()
-		time.sleep(testSeparationDuration * time.Millisecond)
+		time.Sleep(time.Duration(testSeparationDuration) * time.Millisecond)
 
 	}
 

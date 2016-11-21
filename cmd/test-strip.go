@@ -32,7 +32,7 @@ var teststripCmd = &cobra.Command{
 		s := controller.NewStrip()
 		defer s.Close()
 
-		s.Test()
+		s.TestStrip()
 	},
 }
 
