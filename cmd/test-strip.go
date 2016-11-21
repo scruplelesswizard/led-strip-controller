@@ -1,4 +1,4 @@
-// Copyright © 2016 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2016 Jason Murray <jason@chaosaffe.io>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,36 +17,25 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
 )
 
-// test-stripCmd represents the test-strip command
-var test-stripCmd = &cobra.Command{
+// teststripCmd represents the test-strip command
+var teststripCmd = &cobra.Command{
 	Use:   "test-strip",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Tests an LED Strip",
+	Long:  `Runs the default set of tests agains the LED strip to ensure proper operation.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
 		fmt.Println("test-strip called")
+		fmt.Println("Initiating Strip")
+		s := controller.NewStrip()
+		defer s.Close()
+
+		s.Test()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(test-stripCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// test-stripCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// test-stripCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	RootCmd.AddCommand(teststripCmd)
 }
