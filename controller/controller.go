@@ -3,40 +3,32 @@ package controller
 import (
 	"fmt"
 	"time"
-
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/rpi"
 )
 
 type Strip struct {
 	Color RGB
-	rPin  embd.PWMPin
-	gPin  embd.PWMPin
-	bPin  embd.PWMPin
+	rPin  pwmPin
+	gPin  pwmPin
+	bPin  pwmPin
 }
 
-var pinRed = "P1_36"
-var pinGreen = "P1_38"
-var pinBlue = "P1_40"
+var pinRed = "17"
+var pinGreen = "22"
+var pinBlue = "24"
 
 func NewStrip() (strip Strip) {
 
-	err := embd.InitGPIO()
+	rPin, err := newPWMPin(pinRed)
 	if err != nil {
 		panic(err)
 	}
 
-	rPin, err := embd.NewPWMPin(pinRed)
+	gPin, err := newPWMPin(pinGreen)
 	if err != nil {
 		panic(err)
 	}
 
-	gPin, err := embd.NewPWMPin(pinGreen)
-	if err != nil {
-		panic(err)
-	}
-
-	bPin, err := embd.NewPWMPin(pinBlue)
+	bPin, err := newPWMPin(pinBlue)
 	if err != nil {
 		panic(err)
 	}
@@ -79,24 +71,17 @@ func (s *Strip) setPins() {
 	}
 }
 
-func (s *Strip) Close() {
-	s.rPin.Close()
-	s.gPin.Close()
-	s.bPin.Close()
-	embd.CloseGPIO()
-}
-
 func (s *Strip) TestStrip() {
 
 	const testSeparationDuration = 250
 
-	println("Starting Test")
+	println("Testing LED Strip")
 
 	var test TestPatterns
 	test.Default()
 
 	for _, v := range test {
-		fmt.Printf("Starting Test %s", v.Name)
+		fmt.Printf("Starting Test %s\n", v.Name)
 		s.SetColor(v.Color)
 		time.Sleep(time.Duration(v.Duration) * time.Millisecond)
 		s.Off()
