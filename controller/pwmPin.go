@@ -8,21 +8,26 @@ import (
 type pwmPin struct {
 	//GPIO Pin Number
 	Pin   string
-	Value byte
+	Value float32
 }
 
 func newPWMPin(pinNumber string) (pin pwmPin, err error) {
 
 	pin.Pin = pinNumber
-	pin.SetAnalog(0)
+	pin.Set(OFF)
 	return pin, nil
 
 }
 
-func (p *pwmPin) SetAnalog(value byte) error {
-	percentageValue := float32(value) / 255
+func (p *pwmPin) Set(value float32) error {
 
-	data := fmt.Sprintf("%s=%f\n", p.Pin, percentageValue)
+	if value < OFF {
+		value = OFF
+	} else if value > ON {
+		value = ON
+	}
+
+	data := fmt.Sprintf("%s=%f\n", p.Pin, value)
 
 	f, err := os.OpenFile("/dev/pi-blaster", os.O_WRONLY, 0666)
 	if err != nil {

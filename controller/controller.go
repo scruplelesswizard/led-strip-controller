@@ -33,20 +33,13 @@ func NewStrip() (strip Strip) {
 		panic(err)
 	}
 
-	off := RGB{
-		Red:   0,
-		Green: 0,
-		Blue:  0,
-	}
-
 	s := Strip{
-		Color: off,
-		rPin:  rPin,
-		gPin:  gPin,
-		bPin:  bPin,
+		rPin: rPin,
+		gPin: gPin,
+		bPin: bPin,
 	}
 
-	s.setPins()
+	s.Off()
 
 	return s
 
@@ -58,15 +51,15 @@ func (s *Strip) SetColor(color RGB) {
 }
 
 func (s *Strip) setPins() {
-	if err := s.rPin.SetAnalog(s.Color.Red); err != nil {
+	if err := s.rPin.Set(s.Color.Red); err != nil {
 		panic(err)
 	}
 
-	if err := s.gPin.SetAnalog(s.Color.Green); err != nil {
+	if err := s.gPin.Set(s.Color.Green); err != nil {
 		panic(err)
 	}
 
-	if err := s.bPin.SetAnalog(s.Color.Blue); err != nil {
+	if err := s.bPin.Set(s.Color.Blue); err != nil {
 		panic(err)
 	}
 }
