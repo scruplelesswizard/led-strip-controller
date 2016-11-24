@@ -12,7 +12,7 @@ type TestPattern struct {
 type TestPatterns []TestPattern
 
 // ON represents the fully on state for the LED's
-const ON = 255
+const ON = 1
 
 // OFF represents the fully off state for the LED's
 const OFF = 0
@@ -46,7 +46,7 @@ func (t *TestPatterns) Default() {
 
 	whiteHalf := TestPattern{
 		Name:     "Half All",
-		Color:    RGB{Red: 128, Green: 128, Blue: 128},
+		Color:    RGB{Red: ON / 2, Green: ON / 2, Blue: ON / 2},
 		Duration: 1000,
 	}
 

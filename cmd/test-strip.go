@@ -27,10 +27,8 @@ var teststripCmd = &cobra.Command{
 	Short: "Tests an LED Strip",
 	Long:  `Runs the default set of tests agains the LED strip to ensure proper operation.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("test-strip called")
 		fmt.Println("Initiating Strip")
 		s := controller.NewStrip()
-		defer s.Close()
 
 		s.TestStrip()
 	},

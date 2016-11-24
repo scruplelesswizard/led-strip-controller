@@ -3,58 +3,43 @@ package controller
 import (
 	"fmt"
 	"time"
-
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/rpi"
 )
 
 type Strip struct {
 	Color RGB
-	rPin  embd.PWMPin
-	gPin  embd.PWMPin
-	bPin  embd.PWMPin
+	rPin  pwmPin
+	gPin  pwmPin
+	bPin  pwmPin
 }
 
-var pinRed = "P1_36"
-var pinGreen = "P1_38"
-var pinBlue = "P1_40"
+var pinRed = "17"
+var pinGreen = "22"
+var pinBlue = "24"
 
 func NewStrip() (strip Strip) {
 
-	err := embd.InitGPIO()
+	rPin, err := newPWMPin(pinRed)
 	if err != nil {
 		panic(err)
 	}
 
-	rPin, err := embd.NewPWMPin(pinRed)
+	gPin, err := newPWMPin(pinGreen)
 	if err != nil {
 		panic(err)
 	}
 
-	gPin, err := embd.NewPWMPin(pinGreen)
+	bPin, err := newPWMPin(pinBlue)
 	if err != nil {
 		panic(err)
-	}
-
-	bPin, err := embd.NewPWMPin(pinBlue)
-	if err != nil {
-		panic(err)
-	}
-
-	off := RGB{
-		Red:   0,
-		Green: 0,
-		Blue:  0,
 	}
 
 	s := Strip{
-		Color: off,
-		rPin:  rPin,
-		gPin:  gPin,
-		bPin:  bPin,
+		rPin: rPin,
+		gPin: gPin,
+		bPin: bPin,
 	}
 
-	s.setPins()
+	s.Off()
 
 	return s
 
@@ -66,37 +51,30 @@ func (s *Strip) SetColor(color RGB) {
 }
 
 func (s *Strip) setPins() {
-	if err := s.rPin.SetAnalog(s.Color.Red); err != nil {
+	if err := s.rPin.Set(s.Color.Red); err != nil {
 		panic(err)
 	}
 
-	if err := s.gPin.SetAnalog(s.Color.Green); err != nil {
+	if err := s.gPin.Set(s.Color.Green); err != nil {
 		panic(err)
 	}
 
-	if err := s.bPin.SetAnalog(s.Color.Blue); err != nil {
+	if err := s.bPin.Set(s.Color.Blue); err != nil {
 		panic(err)
 	}
-}
-
-func (s *Strip) Close() {
-	s.rPin.Close()
-	s.gPin.Close()
-	s.bPin.Close()
-	embd.CloseGPIO()
 }
 
 func (s *Strip) TestStrip() {
 
 	const testSeparationDuration = 250
 
-	println("Starting Test")
+	println("Testing LED Strip")
 
 	var test TestPatterns
 	test.Default()
 
 	for _, v := range test {
-		fmt.Printf("Starting Test %s", v.Name)
+		fmt.Printf("Starting Test %s\n", v.Name)
 		s.SetColor(v.Color)
 		time.Sleep(time.Duration(v.Duration) * time.Millisecond)
 		s.Off()
@@ -104,8 +82,4 @@ func (s *Strip) TestStrip() {
 
 	}
 
-}
-
-func (s *Strip) Off() {
-	s.SetColor(RGB{Red: 0, Green: 0, Blue: 0})
 }
