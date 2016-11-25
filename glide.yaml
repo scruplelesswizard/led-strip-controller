@@ -1,0 +1,6 @@
+package: github.com/chaosaffe/led-strip-controller
+import:
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: goji.io
+  version: ~1.0.0
