@@ -1,5 +1,5 @@
-hash: 80a6374bb2ef5490c69c9d8db4b106632f4b162ad6b102e15f9be0bf47cc16ae
-updated: 2016-11-24T21:24:31.744112047+01:00
+hash: 5e527b747511237fbe16f2a77249b9e650612c4675948d09acb6faa9823cc95e
+updated: 2016-11-25T14:13:03.919891427+01:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
@@ -38,6 +38,16 @@ imports:
   version: 5ccb023bc27df288a957c5e994cd44fd19619465
 - name: github.com/spf13/viper
   version: 651d9d916abc3c3d6a91a12549495caba5edffd2
+- name: goji.io
+  version: e1741450ad80d2837134e32ac7b1d0a7a2b11c51
+  subpackages:
+  - internal
+  - pat
+  - pattern
+- name: golang.org/x/net
+  version: 4971afdc2f162e82d185353533d3cf16188a9f4e
+  subpackages:
+  - context
 - name: golang.org/x/sys
   version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
   subpackages:
