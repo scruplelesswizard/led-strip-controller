@@ -33,7 +33,7 @@ func percentAdd(a, b float32) float32 {
 }
 
 // Off returns an RGB object that represents the off state for all LED's
-func (a RGB) Off() (black RGB) {
+func (a RGB) Off() (RGB) {
 	return RGB{Red: OFF, Green: OFF, Blue: OFF}
 }
 

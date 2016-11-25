@@ -3,11 +3,11 @@ package controller
 import "time"
 
 // Off sets all LED's on the strip to off
-func (s *Strip) Off() {
-	s.SetColor(s.Color.Off())
+func (s *Strip) Off() error {
+	return s.SetColor(s.Color.Off())
 }
 
-func (s *Strip) Fade(color RGB, duration time.Duration) {
+func (s *Strip) Fade(color RGB, duration time.Duration) error {
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
@@ -26,38 +26,54 @@ func (s *Strip) Fade(color RGB, duration time.Duration) {
 	bStep := bDiff / steps
 
 	for step := 0; step <= int(steps); step++ {
-		s.SetColor(s.Color.add(rStep, gStep, bStep))
+		err := s.SetColor(s.Color.add(rStep, gStep, bStep))
+		if err != nil {
+			return err
+		}
 		time.Sleep(stepDuration)
 	}
 
+	return nil
 }
 
-func (s *Strip) FadeBetween(a, b RGB, duration time.Duration) {
+func (s *Strip) FadeBetween(a, b RGB, duration time.Duration) error {
 
-	s.Fade(a, duration/2)
+	err := s.Fade(a, duration/2)
+	if err != nil {
+		return err
+	}
 	// HACK: This will block. Consider using channel to break when required
 	for {
-		s.Fade(a, duration/2)
-		s.Fade(b, duration/2)
+		err = s.Fade(a, duration/2)
+		if err != nil {
+			return err
+		}
+		err = s.Fade(b, duration/2)
+		if err != nil {
+			return err
+		}
 	}
 
 }
 
-func (s *Strip) FadeOut(duration time.Duration) {
-	s.Fade(s.Color.Off(), duration)
+func (s *Strip) FadeOut(duration time.Duration) error {
+	return s.Fade(s.Color.Off(), duration)
 }
 
-func (s *Strip) FlashBetween(c []RGB, d time.Duration) {
+func (s *Strip) FlashBetween(c []RGB, d time.Duration) error {
 
 	// HACK: This will block. Consider using channel to break when required
 	for {
 		for _, color := range c {
-			s.SetColor(color)
+			err := s.SetColor(color)
+			if err != nil {
+				return err
+			}
 			time.Sleep(d)
 		}
 	}
 }
 
-func (s *Strip) Flash(c RGB, d time.Duration) {
-	s.FlashBetween([]RGB{c, c.Off()}, d)
+func (s *Strip) Flash(c RGB, d time.Duration) error {
+	return s.FlashBetween([]RGB{c, c.Off()}, d)
 }

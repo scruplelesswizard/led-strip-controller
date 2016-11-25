@@ -11,11 +11,15 @@ type pwmPin struct {
 	Value float32
 }
 
-func newPWMPin(pinNumber string) (pin pwmPin, err error) {
-
-	pin.Pin = pinNumber
-	pin.Set(OFF)
-	return pin, nil
+func newPWMPin(pinNumber string) (*pwmPin, error) {
+	p := pwmPin{
+		Pin: pinNumber,
+	}
+	err := p.Set(OFF)
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
 
 }
 
@@ -33,14 +37,21 @@ func (p *pwmPin) Set(value float32) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+
+	err = f.Close()
+	if err != nil {
+		return err
+	}
 
 	_, err = f.WriteString(data)
 	if err != nil {
 		return err
 	}
 
-	f.Sync()
+	err = f.Sync()
+	if err != nil {
+		return err
+	}
 
 	p.Value = value
 

@@ -16,55 +16,60 @@ var pinRed = "17"
 var pinGreen = "22"
 var pinBlue = "24"
 
-func NewStrip() (strip Strip) {
+func NewStrip() (*Strip, error) {
 
 	rPin, err := newPWMPin(pinRed)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize pinRed: %v", err)
 	}
 
 	gPin, err := newPWMPin(pinGreen)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize pinGreen: %v", err)
 	}
 
 	bPin, err := newPWMPin(pinBlue)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize pinBlue: %v", err)
 	}
 
 	s := Strip{
-		rPin: rPin,
-		gPin: gPin,
-		bPin: bPin,
+		rPin: *rPin,
+		gPin: *gPin,
+		bPin: *bPin,
+	}
+	s.Color = RGB{Red: OFF, Green: OFF, Blue: OFF}
+	err = s.Off()
+	if err != nil {
+		return nil, err
 	}
 
-	s.Off()
-
-	return s
+	return &s, nil
 
 }
 
-func (s *Strip) SetColor(color RGB) {
+func (s Strip) SetColor(color RGB) error {
 	s.Color = color
-	s.setPins()
+	return s.setPins()
 }
 
-func (s *Strip) setPins() {
+func (s Strip) setPins() error {
 	if err := s.rPin.Set(s.Color.Red); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set redPin: %v", err)
 	}
 
 	if err := s.gPin.Set(s.Color.Green); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set greenPin: %v", err)
 	}
 
 	if err := s.bPin.Set(s.Color.Blue); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set bluePin: %v", err)
 	}
+
+	return nil
 }
 
-func (s *Strip) TestStrip() {
+func (s Strip) TestStrip() error {
 
 	const testSeparationDuration = 250
 
@@ -75,11 +80,17 @@ func (s *Strip) TestStrip() {
 
 	for _, v := range test {
 		fmt.Printf("Starting Test %s\n", v.Name)
-		s.SetColor(v.Color)
+		err := s.SetColor(v.Color)
+		if err != nil {
+			return err
+		}
 		time.Sleep(time.Duration(v.Duration) * time.Millisecond)
-		s.Off()
+		err = s.Off()
+		if err != nil {
+			return err
+		}
 		time.Sleep(time.Duration(testSeparationDuration) * time.Millisecond)
-
 	}
 
+	return nil
 }

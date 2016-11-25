@@ -16,11 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
 var cfgFile string
@@ -34,16 +33,21 @@ var RootCmd = &cobra.Command{
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
-		s := controller.NewStrip()
-		defer s.Close()
+		s, err := controller.NewStrip()
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		err = s.Off()
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.Fatal(err)
 	}
 }
 
