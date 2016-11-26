@@ -4,8 +4,21 @@ import "math"
 
 // Based on http://blog.saikoled.com/post/43693602826/why-every-led-light-should-be-using-hsi
 
-func HSI2RGB(H, S, I float64) RGB {
+type HSI struct {
+	Hue        float64
+	Saturation float64
+	Intensity  float64
+}
+
+// ToRGB Converts an HSI color representation to an RGB color representation
+func (h HSI) ToRGB() RGB {
 	var r, g, b float64
+	var H, S, I float64
+
+	H = h.Hue
+	S = h.Saturation
+	I = h.Intensity
+
 	H = fmod(H, 360)               // cycle H around to 0-360 degrees
 	H = 3.14159 * H / float64(180) // Convert to radians.
 	// clamp S and I to interval [0,1]
