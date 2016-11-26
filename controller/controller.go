@@ -6,7 +6,7 @@ import (
 )
 
 type Strip struct {
-	Color RGB
+	Color HSI
 	rPin  pwmPin
 	gPin  pwmPin
 	bPin  pwmPin
@@ -45,21 +45,24 @@ func NewStrip() (strip Strip) {
 
 }
 
-func (s *Strip) SetColor(color RGB) {
+func (s *Strip) SetColor(color HSI) {
 	s.Color = color
 	s.setPins()
 }
 
 func (s *Strip) setPins() {
-	if err := s.rPin.Set(s.Color.Red); err != nil {
+
+	color := s.Color.ToRGB()
+
+	if err := s.rPin.Set(color.Red); err != nil {
 		panic(err)
 	}
 
-	if err := s.gPin.Set(s.Color.Green); err != nil {
+	if err := s.gPin.Set(color.Green); err != nil {
 		panic(err)
 	}
 
-	if err := s.bPin.Set(s.Color.Blue); err != nil {
+	if err := s.bPin.Set(color.Blue); err != nil {
 		panic(err)
 	}
 }
@@ -82,4 +85,10 @@ func (s *Strip) TestStrip() {
 
 	}
 
+}
+
+func (s *Strip) Off() {
+	color := s.Color
+	color.Intensity = 0
+	s.SetColor(color)
 }
