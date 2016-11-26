@@ -3,7 +3,7 @@ package controller
 // TestPattern is a struct representing a pattern used to test the strip
 type TestPattern struct {
 	Name  string
-	Color RGB
+	Color HSI
 	// Duration is the duration the pattern should be held in ms
 	Duration int
 }
@@ -22,31 +22,31 @@ func (t *TestPatterns) Default() {
 
 	redFull := TestPattern{
 		Name:     "Full Red",
-		Color:    RGB{Red: ON, Green: OFF, Blue: OFF},
+		Color:    HSI{Hue: 0, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
 	greenFull := TestPattern{
 		Name:     "Full Green",
-		Color:    RGB{Red: OFF, Green: ON, Blue: OFF},
+		Color:    HSI{Hue: 120, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
 	blueFull := TestPattern{
 		Name:     "Full Blue",
-		Color:    RGB{Red: OFF, Green: OFF, Blue: ON},
+		Color:    HSI{Hue: 240, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
 	whiteFull := TestPattern{
 		Name:     "Full All",
-		Color:    RGB{Red: ON, Green: ON, Blue: ON},
+		Color:    HSI{Hue: 0, Saturation: 0, Intensity: 1},
 		Duration: 1000,
 	}
 
 	whiteHalf := TestPattern{
 		Name:     "Half All",
-		Color:    RGB{Red: ON / 2, Green: ON / 2, Blue: ON / 2},
+		Color:    HSI{Hue: 0, Saturation: 1, Intensity: .5},
 		Duration: 1000,
 	}
 
