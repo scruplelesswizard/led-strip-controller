@@ -11,6 +11,9 @@ type pwmPin struct {
 	Value float32
 }
 
+const ON = 1
+const OFF = 0
+
 func newPWMPin(pinNumber string) (pin pwmPin, err error) {
 
 	pin.Pin = pinNumber

@@ -11,12 +11,6 @@ type TestPattern struct {
 // TestPatterns is a collection of TestPattern
 type TestPatterns []TestPattern
 
-// ON represents the fully on state for the LED's
-const ON = 1
-
-// OFF represents the fully off state for the LED's
-const OFF = 0
-
 // Default creates the default test patterns of Full Red, Full Green, Full Blue, Full White, and Half White
 func (t *TestPatterns) Default() {
 
