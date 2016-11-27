@@ -40,7 +40,7 @@ func (t *TestPatterns) Default() {
 
 	whiteHalf := TestPattern{
 		Name:     "Half All",
-		Color:    HSI{Hue: 0, Saturation: 1, Intensity: .5},
+		Color:    HSI{Hue: 0, Saturation: 0, Intensity: .5},
 		Duration: 1000,
 	}
 
