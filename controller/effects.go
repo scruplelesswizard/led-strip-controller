@@ -2,40 +2,38 @@ package controller
 
 import "time"
 
-// Off sets all LED's on the strip to off
-func (s *Strip) Off() {
-	s.SetColor(s.Color.Off())
-}
-
-func (s *Strip) Fade(color RGB, duration time.Duration) {
+func (s *Strip) Fade(color HSI, duration time.Duration) {
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
-	steps := float32(duration / stepDuration)
+	steps := float64(duration / stepDuration)
 
 	// calculate differences
 
-	// TODO: Fades should be done in the HSV space for more appeasing gradients
-
-	rDiff, gDiff, bDiff := color.difference(s.Color)
+	hsiDiff := s.Color.Difference(color)
 
 	// calculate change per steps
 
-	rStep := rDiff / steps
-	gStep := gDiff / steps
-	bStep := bDiff / steps
+	hsiStep := HSI{
+		Hue:        hsiDiff.Hue / steps,
+		Saturation: hsiDiff.Saturation / steps,
+		Intensity:  hsiDiff.Intensity / steps,
+	}
 
 	for step := 0; step <= int(steps); step++ {
-		s.SetColor(s.Color.add(rStep, gStep, bStep))
+		s.SetColor(s.Color.Add(hsiStep))
 		time.Sleep(stepDuration)
 	}
 
+	// clean up floats
+	s.SetColor(color)
+
 }
 
-func (s *Strip) FadeBetween(a, b RGB, duration time.Duration) {
+func (s *Strip) FadeBetween(a, b HSI, duration time.Duration) {
 
 	s.Fade(a, duration/2)
-	// HACK: This will block. Consider using channel to break when required
+	// HACK: This will block. Use channel to break when required
 	for {
 		s.Fade(a, duration/2)
 		s.Fade(b, duration/2)
@@ -47,9 +45,9 @@ func (s *Strip) FadeOut(duration time.Duration) {
 	s.Fade(s.Color.Off(), duration)
 }
 
-func (s *Strip) FlashBetween(c []RGB, d time.Duration) {
+func (s *Strip) FlashBetween(c []HSI, d time.Duration) {
 
-	// HACK: This will block. Consider using channel to break when required
+	// HACK: This will block. Use channel to break when required
 	for {
 		for _, color := range c {
 			s.SetColor(color)
@@ -58,6 +56,6 @@ func (s *Strip) FlashBetween(c []RGB, d time.Duration) {
 	}
 }
 
-func (s *Strip) Flash(c RGB, d time.Duration) {
-	s.FlashBetween([]RGB{c, c.Off()}, d)
+func (s *Strip) Flash(c HSI, d time.Duration) {
+	s.FlashBetween([]HSI{c, s.Color.Off()}, d)
 }
