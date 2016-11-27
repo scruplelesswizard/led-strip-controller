@@ -10,6 +10,43 @@ type HSI struct {
 	Intensity  float64
 }
 
+func (h HSI) Add(addend HSI) HSI {
+
+	const HueMin = 0
+	const HueMax = 360
+
+	h.Hue += addend.Hue
+	h.Saturation = clamp(addend.Saturation+h.Saturation, 0, 1)
+	h.Intensity = clamp(addend.Intensity+h.Intensity, 0, 1)
+
+	if h.Hue > HueMax {
+		h.Hue -= HueMax
+	}
+	if h.Hue < HueMin {
+		h.Hue += HueMax
+	}
+
+	return h
+}
+
+func (h HSI) Difference(b HSI) HSI {
+
+	hDiff := b.Hue - h.Hue
+	sDiff := b.Saturation - h.Saturation
+	iDiff := b.Intensity - h.Intensity
+
+	if hDiff > 180 {
+		hDiff -= 360
+	}
+
+	return HSI{Hue: hDiff, Saturation: sDiff, Intensity: iDiff}
+}
+
+func (h HSI) Off() HSI {
+	h.Intensity = 0
+	return h
+}
+
 // ToRGB Converts an HSI color representation to an RGB color representation
 func (h HSI) ToRGB() RGB {
 	var r, g, b float64
