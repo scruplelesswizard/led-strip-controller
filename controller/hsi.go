@@ -10,6 +10,16 @@ type HSI struct {
 	Intensity  float64
 }
 
+const HueRed = 0
+const HueOrange = 30
+const HueYellow = 60
+const HueGreen = 120
+const HueCyan = 180
+const HueBlue = 240
+const HueViolet = 260
+const HueMagenta = 300
+const HuePink = 320
+
 func (h HSI) Add(addend HSI) HSI {
 
 	const HueMin = 0

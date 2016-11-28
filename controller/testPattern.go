@@ -16,19 +16,19 @@ func (t *TestPatterns) Default() {
 
 	redFull := TestPattern{
 		Name:     "Full Red",
-		Color:    HSI{Hue: 0, Saturation: 1, Intensity: 1},
+		Color:    HSI{Hue: HueRed, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
 	greenFull := TestPattern{
 		Name:     "Full Green",
-		Color:    HSI{Hue: 120, Saturation: 1, Intensity: 1},
+		Color:    HSI{Hue: HueGreen, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
 	blueFull := TestPattern{
 		Name:     "Full Blue",
-		Color:    HSI{Hue: 240, Saturation: 1, Intensity: 1},
+		Color:    HSI{Hue: HueBlue, Saturation: 1, Intensity: 1},
 		Duration: 1000,
 	}
 
