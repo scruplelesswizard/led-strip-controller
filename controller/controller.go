@@ -12,23 +12,19 @@ type Strip struct {
 	bPin  pwmPin
 }
 
-var pinRed = "17"
-var pinGreen = "22"
-var pinBlue = "24"
+func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (strip Strip) {
 
-func NewStrip() (strip Strip) {
-
-	rPin, err := newPWMPin(pinRed)
+	rPin, err := newPWMPin(rPinNumber)
 	if err != nil {
 		panic(err)
 	}
 
-	gPin, err := newPWMPin(pinGreen)
+	gPin, err := newPWMPin(gPinNumber)
 	if err != nil {
 		panic(err)
 	}
 
-	bPin, err := newPWMPin(pinBlue)
+	bPin, err := newPWMPin(bPinNumber)
 	if err != nil {
 		panic(err)
 	}
