@@ -2,7 +2,23 @@ package controller
 
 import "time"
 
-func (s *Strip) Fade(color HSI, duration time.Duration) {
+func (s *Strip) Rotate(stop chan bool) {
+
+	d, _ := time.ParseDuration("50ms")
+	s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
+	for {
+		select {
+		case <-stop:
+			return
+		default:
+			s.SetColor(s.Color.Add(HSI{Hue: 1, Saturation: 0, Intensity: 0}))
+			time.Sleep(d)
+		}
+
+	}
+}
+
+func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) {
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
@@ -21,8 +37,14 @@ func (s *Strip) Fade(color HSI, duration time.Duration) {
 	}
 
 	for step := 0; step <= int(steps); step++ {
-		s.SetColor(s.Color.Add(hsiStep))
-		time.Sleep(stepDuration)
+		select {
+		case <-stop:
+			return
+		default:
+			s.SetColor(s.Color.Add(hsiStep))
+			time.Sleep(stepDuration)
+		}
+
 	}
 
 	// clean up floats
@@ -30,19 +52,27 @@ func (s *Strip) Fade(color HSI, duration time.Duration) {
 
 }
 
-func (s *Strip) FadeBetween(a, b HSI, duration time.Duration) {
+func (s *Strip) FadeBetween(a, b HSI, duration time.Duration, stop chan bool) {
 
-	s.Fade(a, duration/2)
-	// HACK: This will block. Use channel to break when required
+	s.Fade(a, duration/2, stop)
+	if <-stop {
+		return
+	}
 	for {
-		s.Fade(b, duration/2)
-		s.Fade(a, duration/2)
+		switch {
+		case <-stop:
+			return
+		default:
+			s.Fade(b, duration/2, stop)
+			s.Fade(a, duration/2, stop)
+		}
+
 	}
 
 }
 
-func (s *Strip) FadeOut(duration time.Duration) {
-	s.Fade(s.Color.Off(), duration)
+func (s *Strip) FadeOut(duration time.Duration, stop chan bool) {
+	s.Fade(s.Color.Off(), duration, stop)
 }
 
 func (s *Strip) FlashBetween(c []HSI, d time.Duration) {
