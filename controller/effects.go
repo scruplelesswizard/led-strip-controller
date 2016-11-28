@@ -35,8 +35,8 @@ func (s *Strip) FadeBetween(a, b HSI, duration time.Duration) {
 	s.Fade(a, duration/2)
 	// HACK: This will block. Use channel to break when required
 	for {
-		s.Fade(a, duration/2)
 		s.Fade(b, duration/2)
+		s.Fade(a, duration/2)
 	}
 
 }
