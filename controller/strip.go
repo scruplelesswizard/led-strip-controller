@@ -46,21 +46,22 @@ func (s *Strip) SetColor(color HSI) {
 	s.setPins()
 }
 
-func (s *Strip) setPins() {
+func (s *Strip) setPins() error {
 
 	color := s.Color.ToRGB()
 
 	if err := s.rPin.Set(color.Red); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set rPin: %v", err)
 	}
 
 	if err := s.gPin.Set(color.Green); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set gPin: %v", err)
 	}
 
 	if err := s.bPin.Set(color.Blue); err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to set bPin: %v", err)
 	}
+	return nil
 }
 
 func (s *Strip) TestStrip() {
