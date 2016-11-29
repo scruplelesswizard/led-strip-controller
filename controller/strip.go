@@ -12,32 +12,32 @@ type Strip struct {
 	bPin  pwmPin
 }
 
-func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (strip Strip) {
+func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (*Strip, error) {
 
 	rPin, err := newPWMPin(rPinNumber)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize rPin: %v", err)
 	}
 
 	gPin, err := newPWMPin(gPinNumber)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize gPin: %v", err)
 	}
 
 	bPin, err := newPWMPin(bPinNumber)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Failed to initialize bPin: %v", err)
 	}
 
 	s := Strip{
-		rPin: rPin,
-		gPin: gPin,
-		bPin: bPin,
+		rPin: *rPin,
+		gPin: *gPin,
+		bPin: *bPin,
 	}
 
 	s.Off()
 
-	return s
+	return &s, nil
 
 }
 
