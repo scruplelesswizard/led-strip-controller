@@ -41,9 +41,9 @@ func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (*Strip, error) {
 
 }
 
-func (s *Strip) SetColor(color HSI) {
+func (s *Strip) SetColor(color HSI) error {
 	s.Color = color
-	s.setPins()
+	return s.setPins()
 }
 
 func (s *Strip) setPins() error {
