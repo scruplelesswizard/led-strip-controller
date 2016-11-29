@@ -64,7 +64,7 @@ func (s *Strip) setPins() error {
 	return nil
 }
 
-func (s *Strip) TestStrip() {
+func (s *Strip) TestStrip() error {
 
 	const testSeparationDuration = 250
 
@@ -75,17 +75,23 @@ func (s *Strip) TestStrip() {
 
 	for _, v := range test {
 		fmt.Printf("Starting Test %s\n", v.Name)
-		s.SetColor(v.Color)
+		err := s.SetColor(v.Color)
+		if err != nil {
+			return err
+		}
 		time.Sleep(time.Duration(v.Duration) * time.Millisecond)
-		s.Off()
+		err = s.Off()
+		if err != nil {
+			return err
+		}
 		time.Sleep(time.Duration(testSeparationDuration) * time.Millisecond)
 
 	}
-
+	return nil
 }
 
-func (s *Strip) Off() {
+func (s *Strip) Off() error {
 	color := s.Color
 	color.Intensity = 0
-	s.SetColor(color)
+	return s.SetColor(color)
 }
