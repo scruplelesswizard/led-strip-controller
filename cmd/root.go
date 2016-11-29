@@ -16,7 +16,7 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
@@ -24,6 +24,10 @@ import (
 )
 
 var cfgFile string
+
+var pinRed = "17"
+var pinGreen = "22"
+var pinBlue = "24"
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -34,16 +38,17 @@ var RootCmd = &cobra.Command{
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
-		s := controller.NewStrip()
-		defer s.Close()
+		s, err := controller.NewStrip(pinRed, pinGreen, pinBlue)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 	},
 }
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.Fatal(err)
 	}
 }
 
