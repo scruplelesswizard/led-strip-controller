@@ -66,19 +66,28 @@ func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
 
 }
 
-func (s *Strip) FadeBetween(a, b HSI, duration time.Duration, stop chan bool) {
+func (s *Strip) FadeBetween(a, b HSI, duration time.Duration, stop chan bool) error {
 
-	s.Fade(a, duration/2, stop)
+	err := s.Fade(a, duration/2, stop)
+	if err != nil {
+		return err
+	}
 	if <-stop {
-		return
+		return nil
 	}
 	for {
 		switch {
 		case <-stop:
-			return
+			return nil
 		default:
-			s.Fade(b, duration/2, stop)
-			s.Fade(a, duration/2, stop)
+			err = s.Fade(b, duration/2, stop)
+			if err != nil {
+				return err
+			}
+			err = s.Fade(a, duration/2, stop)
+			if err != nil {
+				return err
+			}
 		}
 
 	}
