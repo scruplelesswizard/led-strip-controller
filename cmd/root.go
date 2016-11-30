@@ -55,10 +55,6 @@ var RootCmd = &cobra.Command{
 		for _, strip := range s {
 			fmt.Println(strip)
 		}
-		// s, err := controller.NewStrip(pinRed, pinGreen, pinBlue)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
 
 	},
 }
