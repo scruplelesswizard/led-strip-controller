@@ -89,7 +89,7 @@ func (h HSI) ToRGB() RGB {
 		g = I / 3 * (1 - S)
 	}
 
-	return RGB{Red: float32(r), Green: float32(g), Blue: float32(b)}
+	return RGB{Red: r, Green: g, Blue: b}
 
 }
 

@@ -8,7 +8,7 @@ import (
 type pwmPin struct {
 	//GPIO Pin Number
 	Pin   string
-	Value float32
+	Value float64
 }
 
 const ON = 1
@@ -26,7 +26,7 @@ func newPWMPin(pinNumber string) (*pwmPin, error) {
 
 }
 
-func (p *pwmPin) Set(value float32) error {
+func (p *pwmPin) Set(value float64) error {
 
 	if value < OFF {
 		value = OFF
