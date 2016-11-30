@@ -102,15 +102,19 @@ func (s *Strip) FadeOut(duration time.Duration, stop chan bool) error {
 	return nil
 }
 
-func (s *Strip) FlashBetween(c []HSI, d time.Duration) {
+func (s *Strip) FlashBetween(c []HSI, d time.Duration) error {
 
 	// HACK: This will block. Use channel to break when required
 	for {
 		for _, color := range c {
-			s.SetColor(color)
+			err := s.SetColor(color)
+			if err != nil {
+				return err
+			}
 			time.Sleep(d)
 		}
 	}
+	return nil
 }
 
 func (s *Strip) Flash(c HSI, d time.Duration) {
