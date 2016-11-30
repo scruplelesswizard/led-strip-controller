@@ -37,8 +37,6 @@ func NewStrip(name string, rPinNumber, gPinNumber, bPinNumber string) (*Strip, e
 		bPin: *bPin,
 	}
 
-	s.Off()
-
 	return &s, nil
 
 }
