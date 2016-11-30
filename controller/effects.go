@@ -2,16 +2,22 @@ package controller
 
 import "time"
 
-func (s *Strip) Rotate(stop chan bool) {
+func (s *Strip) Rotate(stop chan bool) error {
 
 	d, _ := time.ParseDuration("50ms")
-	s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
+	err := s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
+	if err != nil {
+		return err
+	}
 	for {
 		select {
 		case <-stop:
-			return
+			return nil
 		default:
-			s.SetColor(s.Color.Add(HSI{Hue: 1, Saturation: 0, Intensity: 0}))
+			err = s.SetColor(s.Color.Add(HSI{Hue: 1, Saturation: 0, Intensity: 0}))
+			if err != nil {
+				return err
+			}
 			time.Sleep(d)
 		}
 
