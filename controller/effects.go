@@ -125,19 +125,26 @@ func (s *Strip) Flash(c HSI, d time.Duration) error {
 	return nil
 }
 
-func (s *Strip) Pulse(c HSI, d time.Duration) {
+func (s *Strip) Pulse(c HSI, d time.Duration) error {
 	var intensity float64
 	color := HSI{Hue: 0, Saturation: 1, Intensity: .5}
 	for {
 		for intensity = .3; intensity < .4; intensity = intensity + 0.001 {
 			color.Intensity = intensity
-			s.SetColor(color)
+			err := s.SetColor(color)
+			if err != nil {
+				return err
+			}
 			time.Sleep(d)
 		}
 		for intensity = .4; intensity > .3; intensity = intensity - 0.001 {
 			color.Intensity = intensity
-			s.SetColor(color)
+			err := s.SetColor(color)
+			if err != nil {
+				return err
+			}
 			time.Sleep(d * 2)
 		}
 	}
+	return nil
 }
