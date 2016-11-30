@@ -117,8 +117,12 @@ func (s *Strip) FlashBetween(c []HSI, d time.Duration) error {
 	return nil
 }
 
-func (s *Strip) Flash(c HSI, d time.Duration) {
-	s.FlashBetween([]HSI{c, s.Color.Off()}, d)
+func (s *Strip) Flash(c HSI, d time.Duration) error {
+	err := s.FlashBetween([]HSI{c, s.Color.Off()}, d)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Strip) Pulse(c HSI, d time.Duration) {
