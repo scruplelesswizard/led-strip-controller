@@ -6,6 +6,7 @@ import (
 )
 
 type Strip struct {
+	Name  string
 	Color HSI
 	rPin  pwmPin
 	gPin  pwmPin
