@@ -24,7 +24,7 @@ func (s *Strip) Rotate(stop chan bool) error {
 	}
 }
 
-func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) {
+func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
@@ -45,16 +45,24 @@ func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) {
 	for step := 0; step <= int(steps); step++ {
 		select {
 		case <-stop:
-			return
+			return nil
 		default:
-			s.SetColor(s.Color.Add(hsiStep))
+			err := s.SetColor(s.Color.Add(hsiStep))
+			if err != nil {
+				return err
+			}
 			time.Sleep(stepDuration)
 		}
 
 	}
 
 	// clean up floats
-	s.SetColor(color)
+	err := s.SetColor(color)
+	if err != nil {
+		return err
+	}
+
+	return nil
 
 }
 
