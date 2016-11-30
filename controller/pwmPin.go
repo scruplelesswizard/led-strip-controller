@@ -28,11 +28,7 @@ func newPWMPin(pinNumber string) (*pwmPin, error) {
 
 func (p *pwmPin) Set(value float64) error {
 
-	if value < OFF {
-		value = OFF
-	} else if value > ON {
-		value = ON
-	}
+	value = clamp(value, OFF, ON)
 
 	data := fmt.Sprintf("%s=%f\n", p.Pin, value)
 
