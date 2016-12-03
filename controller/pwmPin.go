@@ -43,11 +43,6 @@ func (p *pwmPin) Set(value float64) error {
 		return err
 	}
 
-	err = f.Sync()
-	if err != nil {
-		return err
-	}
-
 	p.Value = value
 
 	return nil
