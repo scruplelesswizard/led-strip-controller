@@ -17,7 +17,11 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 
+	"goji.io"
+
+	"github.com/chaosaffe/led-strip-controller/api"
 	"github.com/chaosaffe/led-strip-controller/config"
 	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
@@ -37,24 +41,13 @@ var RootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var s controller.Strips
+		path := "./strips-example.yaml"
+		config.BuildStrips(path)
 
-		path := stripFile
-		sD, err := config.LoadStripsDefFromFile(path)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, stripDef := range sD.Strips {
-			strip, err := controller.NewStrip(stripDef.Name, stripDef.RedPin, stripDef.GreenPin, stripDef.BluePin)
-			if err != nil {
-				log.Fatal(err)
-			}
-			s.AddStrip(strip)
-		}
-
-		for _, strip := range s {
-			fmt.Println(strip)
-		}
+		mux := goji.NewMux()
+		api.Init(&s)
+		api.Register(mux)
+		http.ListenAndServe(":8000", mux)
 
 	},
 }

@@ -3,7 +3,10 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+
+	"github.com/chaosaffe/led-strip-controller/controller"
 
 	"gopkg.in/yaml.v2"
 )
@@ -40,5 +43,27 @@ func LoadStripsDefFromFile(path string) (*StripsDef, error) {
 	}
 
 	return sD, nil
+
+}
+
+func BuildStrips(path string) controller.Strips {
+
+	var s controller.Strips
+
+	sD, err := LoadStripsDefFromFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, stripDef := range sD.Strips {
+		strip, err := controller.NewStrip(stripDef.Name, stripDef.RedPin, stripDef.GreenPin, stripDef.BluePin)
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.AddStrip(strip)
+		log.Printf("Created Strip %s", strip.Name)
+	}
+
+	return s
 
 }
