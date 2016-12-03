@@ -4,3 +4,4 @@ import:
 - package: github.com/spf13/viper
 - package: goji.io
   version: ~1.0.0
+- package: github.com/cskr/pubsub
