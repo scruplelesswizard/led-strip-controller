@@ -23,7 +23,6 @@ import (
 
 	"github.com/chaosaffe/led-strip-controller/api"
 	"github.com/chaosaffe/led-strip-controller/config"
-	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,17 +35,13 @@ var RootCmd = &cobra.Command{
 	Use:   "led-strip-controller",
 	Short: "Does stuff",
 	Long:  `Does stuff`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var s controller.Strips
 		path := "./strips-example.yaml"
-		config.BuildStrips(path)
+		s := config.BuildStrips(path)
 
 		mux := goji.NewMux()
-		api.Init(&s)
-		api.Register(mux)
+		api.Register(mux, s)
 		http.ListenAndServe(":8000", mux)
 
 	},
