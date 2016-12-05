@@ -1,8 +1,20 @@
 package controller
 
-import "time"
+import (
+	"time"
 
-func (s *Strip) Rotate(stop chan bool) error {
+	"github.com/cskr/pubsub"
+)
+
+var ps *pubsub.PubSub
+
+func init() {
+	ps = pubsub.New(1)
+}
+
+func (s *Strip) Rotate() error {
+
+	stop := s.StopChan()
 
 	d, _ := time.ParseDuration("50ms")
 	err := s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
@@ -24,7 +36,9 @@ func (s *Strip) Rotate(stop chan bool) error {
 	}
 }
 
-func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
+func (s *Strip) Fade(color HSI, duration time.Duration) error {
+
+	stop := s.StopChan()
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
@@ -66,36 +80,28 @@ func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
 
 }
 
-func (s *Strip) FadeBetween(a, b HSI, duration time.Duration, stop chan bool) error {
+func (s *Strip) FadeBetween(colors []HSI, duration time.Duration) error {
 
-	err := s.Fade(a, duration/2, stop)
-	if err != nil {
-		return err
-	}
-
-	if <-stop {
-		return nil
-	}
+	stop := s.StopChan()
 
 	for {
-		switch {
-		case <-stop:
-			return nil
-		default:
-			err = s.Fade(b, duration/2, stop)
-			if err != nil {
-				return err
-			}
-			err = s.Fade(a, duration/2, stop)
-			if err != nil {
-				return err
+		for _, color := range colors {
+			switch {
+			case <-stop:
+				return nil
+			default:
+				err := s.Fade(color, duration/2)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 }
 
-func (s *Strip) FadeOut(duration time.Duration, stop chan bool) error {
-	err := s.Fade(s.Color.Off(), duration, stop)
+func (s *Strip) FadeOut(duration time.Duration) error {
+
+	err := s.Fade(s.Color.Off(), duration)
 	if err != nil {
 		return err
 	}
@@ -147,4 +153,11 @@ func (s *Strip) Pulse(c HSI, d time.Duration) error {
 		}
 	}
 	return nil
+}
+
+func (s *Strip) Off() error {
+	s.Stop()
+	color := s.Color
+	color.Intensity = 0
+	return s.SetColor(color)
 }
