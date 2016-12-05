@@ -46,7 +46,7 @@ func LoadStripsDefFromFile(path string) (*StripsDef, error) {
 
 }
 
-func BuildStrips(path string) controller.Strips {
+func BuildStrips(path string) *controller.Strips {
 
 	var s controller.Strips
 
@@ -64,6 +64,6 @@ func BuildStrips(path string) controller.Strips {
 		log.Printf("Created Strip %s", strip.Name)
 	}
 
-	return s
+	return &s
 
 }
