@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/chaosaffe/led-strip-controller/controller"
+	"github.com/chaosaffe/led-strip-controller/config"
 	"github.com/spf13/cobra"
 )
 
@@ -29,14 +29,15 @@ var teststripCmd = &cobra.Command{
 	Long:  `Runs the default set of tests agains the LED strip to ensure proper operation.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Initiating Strip")
-		s, err := controller.NewStrip(pinRed, pinGreen, pinBlue)
-		if err != nil {
-			log.Fatal(err)
-		}
 
-		err = s.TestStrip()
-		if err != nil {
-			log.Fatal(err)
+		path := "./strips-example.yaml"
+		s := config.BuildStrips(path)
+
+		for _, strip := range *s {
+			err := strip.TestStrip()
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	},
 }
