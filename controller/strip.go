@@ -68,7 +68,7 @@ func (s *Strip) TestStrip() error {
 
 	const testSeparationDuration = 250
 
-	println("Testing LED Strip")
+	fmt.Printf("Testing LED Strip %s", s.Name)
 
 	var test TestPatterns
 	test.Default()
