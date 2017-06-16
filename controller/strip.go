@@ -97,3 +97,7 @@ func (s *Strip) Stop() {
 func (s *Strip) StopChan() chan interface{} {
 	return ps.Sub(s.Name)
 }
+
+func (s *Strip) Unsub(ch chan interface{}) {
+	ps.Unsub(ch, s.Name)
+}
