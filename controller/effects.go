@@ -19,7 +19,7 @@ func (s *Strip) Rotate() error {
 	defer s.Unsub(stop)
 
 	d, _ := time.ParseDuration("50ms")
-	err := s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
+	err := s.SetColor(HSI{Hue: s.Color.Hue, Saturation: 1, Intensity: 1})
 	if err != nil {
 		return err
 	}
