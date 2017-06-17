@@ -14,7 +14,9 @@ func init() {
 
 func (s *Strip) Rotate() error {
 
+	s.Stop()
 	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	d, _ := time.ParseDuration("50ms")
 	err := s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
@@ -39,6 +41,7 @@ func (s *Strip) Rotate() error {
 func (s *Strip) Fade(color HSI, duration time.Duration) error {
 
 	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
@@ -82,7 +85,9 @@ func (s *Strip) Fade(color HSI, duration time.Duration) error {
 
 func (s *Strip) FadeBetween(colors []HSI, duration time.Duration) error {
 
+	s.Stop()
 	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	for {
 		for _, color := range colors {
@@ -110,7 +115,10 @@ func (s *Strip) FadeOut(duration time.Duration) error {
 
 func (s *Strip) FlashBetween(c []HSI, d time.Duration) error {
 
-	// HACK: This will block. Use channel to break when required
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
+
 	for {
 		for _, color := range c {
 			err := s.SetColor(color)
