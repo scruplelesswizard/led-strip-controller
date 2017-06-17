@@ -55,6 +55,7 @@ func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
 
 	// calculate differences
 
+	s.OverrideOff(color)
 
 	diff := s.Color.Difference(color)
 
@@ -175,4 +176,11 @@ func (s *Strip) Off() error {
 	color := s.Color
 	color.Intensity = 0
 	return s.SetColor(color)
+}
+
+func (s *Strip) OverrideOff(color HSI) {
+	if s.Color.Intensity == 0 {
+		s.Color.Hue = color.Hue
+		s.Color.Saturation = color.Saturation
+	}
 }
