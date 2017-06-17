@@ -55,14 +55,15 @@ func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
 
 	// calculate differences
 
-	hsiDiff := s.Color.Difference(color)
+
+	diff := s.Color.Difference(color)
 
 	// calculate change per steps
 
-	hsiStep := HSI{
-		Hue:        hsiDiff.Hue / steps,
-		Saturation: hsiDiff.Saturation / steps,
-		Intensity:  hsiDiff.Intensity / steps,
+	changeStep := HSI{
+		Hue:        diff.Hue / steps,
+		Saturation: diff.Saturation / steps,
+		Intensity:  diff.Intensity / steps,
 	}
 
 	for step := 0; step <= int(steps); step++ {
@@ -70,7 +71,7 @@ func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
 		case <-stop:
 			return nil
 		default:
-			err := s.SetColor(s.Color.Add(hsiStep))
+			err := s.SetColor(s.Color.Add(changeStep))
 			if err != nil {
 				return err
 			}
