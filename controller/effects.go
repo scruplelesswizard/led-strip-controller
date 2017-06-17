@@ -38,14 +38,20 @@ func (s *Strip) Rotate() error {
 	}
 }
 
-func (s *Strip) Fade(color HSI, duration time.Duration) error {
+func (s *Strip) Fade(color HSI, effectDuration time.Duration) error {
+
+	s.Stop()
+	return s.fade(color, effectDuration)
+}
+
+func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
 
 	stop := s.StopChan()
 	defer s.Unsub(stop)
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
-	steps := float64(duration / stepDuration)
+	steps := float64(effectDuration / stepDuration)
 
 	// calculate differences
 
