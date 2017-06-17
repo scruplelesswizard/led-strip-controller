@@ -67,7 +67,9 @@ func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
 		Intensity:  diff.Intensity / steps,
 	}
 
-	for step := 0; step <= int(steps); step++ {
+	stepCount := int(steps)
+
+	for step := 0; step <= stepCount; step++ {
 		select {
 		case <-stop:
 			return nil
