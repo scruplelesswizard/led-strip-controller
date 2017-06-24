@@ -42,6 +42,7 @@ func (s *Strip) Fade(color HSI, effectDuration time.Duration) error {
 
 	s.Stop()
 	return s.fade(color, effectDuration)
+
 }
 
 func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
@@ -100,7 +101,7 @@ func (s *Strip) FadeBetween(colors []HSI, effectDuration time.Duration) error {
 
 	for {
 		for _, color := range colors {
-			switch {
+			select {
 			case <-stop:
 				return nil
 			default:
@@ -113,8 +114,9 @@ func (s *Strip) FadeBetween(colors []HSI, effectDuration time.Duration) error {
 	}
 }
 
-func (s *Strip) FadeOut(duration time.Duration) error {
+func (s *Strip) FadeOut(effectDuration time.Duration) error {
 
+	s.Stop()
 
 	err := s.fade(s.Color.Off(), effectDuration)
 	if err != nil {
@@ -131,14 +133,19 @@ func (s *Strip) FlashBetween(c []HSI, d time.Duration) error {
 
 	for {
 		for _, color := range c {
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+			select {
+			case <-stop:
+				return nil
+			default:
+				err := s.SetColor(color)
+				if err != nil {
+					return err
+				}
+				time.Sleep(d)
 			}
-			time.Sleep(d)
 		}
 	}
-	return nil
+
 }
 
 func (s *Strip) Flash(c HSI, d time.Duration) error {
@@ -150,27 +157,42 @@ func (s *Strip) Flash(c HSI, d time.Duration) error {
 }
 
 func (s *Strip) Pulse(c HSI, d time.Duration) error {
-	var intensity float64
-	color := HSI{Hue: 0, Saturation: 1, Intensity: .5}
+
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
+
+	maxIntensity := .4
+	minIntensity := .3
+	stepDistance := 0.001
+	sleepCycles := int64((maxIntensity - minIntensity) / stepDistance)
+	sleepDuration := time.Duration((d.Nanoseconds() / sleepCycles)) * time.Nanosecond
+
+	var i float64
+
 	for {
-		for intensity = .3; intensity < .4; intensity = intensity + 0.001 {
-			color.Intensity = intensity
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+		select {
+		case <-stop:
+			return nil
+		default:
+			for i = minIntensity; i < maxIntensity; i += stepDistance {
+				c.Intensity = i
+				err := s.SetColor(c)
+				if err != nil {
+					return err
+				}
+				time.Sleep(sleepDuration)
 			}
-			time.Sleep(d)
-		}
-		for intensity = .4; intensity > .3; intensity = intensity - 0.001 {
-			color.Intensity = intensity
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+			for i = maxIntensity; i > minIntensity; i -= stepDistance {
+				c.Intensity = i
+				err := s.SetColor(c)
+				if err != nil {
+					return err
+				}
+				time.Sleep(sleepDuration * 2)
 			}
-			time.Sleep(d * 2)
 		}
 	}
-	return nil
 }
 
 func (s *Strip) Off() error {
