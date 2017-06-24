@@ -82,7 +82,21 @@ func rotate(c context.Context, w http.ResponseWriter, r *http.Request) {
 		log.Printf("Could not use strip '%s': %s", name, err)
 		return
 	}
-	go s.Rotate()
+
+	var req DurationOnlyRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.Rotate(d)
 }
 
 func fade(c context.Context, w http.ResponseWriter, r *http.Request) {
