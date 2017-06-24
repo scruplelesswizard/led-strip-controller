@@ -12,13 +12,14 @@ func init() {
 	ps = pubsub.New(1)
 }
 
-func (s *Strip) Rotate() error {
+func (s *Strip) Rotate(d time.Duration) error {
 
 	s.Stop()
 	stop := s.StopChan()
 	defer s.Unsub(stop)
 
-	d, _ := time.ParseDuration("50ms")
+	stepDuration := time.Duration((d.Nanoseconds() / 360)) * time.Nanosecond
+
 	err := s.SetColor(HSI{Hue: s.Color.Hue, Saturation: 1, Intensity: 1})
 	if err != nil {
 		return err
@@ -32,7 +33,7 @@ func (s *Strip) Rotate() error {
 			if err != nil {
 				return err
 			}
-			time.Sleep(d)
+			time.Sleep(stepDuration)
 		}
 
 	}
