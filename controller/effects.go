@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"math"
 	"time"
 
 	"github.com/cskr/pubsub"
@@ -45,20 +46,19 @@ func (s *Strip) Fade(color HSI, effectDuration time.Duration) error {
 
 }
 
-func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
+func (s *Strip) fade(color HSI, d time.Duration) error {
 
 	stop := s.StopChan()
 	defer s.Unsub(stop)
 
 	// calculate step duration and # of steps
-	stepDuration := time.Duration(20) * time.Millisecond
-	steps := float64(effectDuration / stepDuration)
-
-	// calculate differences
-
 	s.OverrideOff(color)
 
 	diff := s.Color.Difference(color)
+
+	steps := math.Max(diff.Hue, math.Max(diff.Intensity, diff.Saturation))
+
+	stepDuration := time.Duration((d.Nanoseconds() / int64(steps))) * time.Nanosecond
 
 	// calculate change per steps
 
