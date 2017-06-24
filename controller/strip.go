@@ -6,13 +6,14 @@ import (
 )
 
 type Strip struct {
+	Name  string
 	Color HSI
 	rPin  pwmPin
 	gPin  pwmPin
 	bPin  pwmPin
 }
 
-func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (*Strip, error) {
+func NewStrip(name string, rPinNumber, gPinNumber, bPinNumber string) (*Strip, error) {
 
 	rPin, err := newPWMPin(rPinNumber)
 	if err != nil {
@@ -30,12 +31,11 @@ func NewStrip(rPinNumber, gPinNumber, bPinNumber string) (*Strip, error) {
 	}
 
 	s := Strip{
+		Name: name,
 		rPin: *rPin,
 		gPin: *gPin,
 		bPin: *bPin,
 	}
-
-	s.Off()
 
 	return &s, nil
 

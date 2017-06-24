@@ -17,17 +17,19 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 
+	"goji.io"
+
+	"github.com/chaosaffe/led-strip-controller/api"
+	"github.com/chaosaffe/led-strip-controller/config"
 	"github.com/chaosaffe/led-strip-controller/controller"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
-
-var pinRed = "17"
-var pinGreen = "22"
-var pinBlue = "24"
+var stripFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -38,10 +40,14 @@ var RootCmd = &cobra.Command{
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
-		s, err := controller.NewStrip(pinRed, pinGreen, pinBlue)
-		if err != nil {
-			log.Fatal(err)
-		}
+		var s controller.Strips
+		path := "./strips-example.yaml"
+		config.BuildStrips(path)
+
+		mux := goji.NewMux()
+		api.Init(&s)
+		api.Register(mux)
+		http.ListenAndServe(":8000", mux)
 
 	},
 }
@@ -55,6 +61,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.led-strip-controller.yaml)")
+	RootCmd.PersistentFlags().StringVar(&stripFile, "strips-config", "", "LED strip definition file path")
 }
 
 // initConfig reads in config file and ENV variables if set.

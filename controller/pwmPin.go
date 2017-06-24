@@ -8,7 +8,7 @@ import (
 type pwmPin struct {
 	//GPIO Pin Number
 	Pin   string
-	Value float32
+	Value float64
 }
 
 const ON = 1
@@ -26,13 +26,9 @@ func newPWMPin(pinNumber string) (*pwmPin, error) {
 
 }
 
-func (p *pwmPin) Set(value float32) error {
+func (p *pwmPin) Set(value float64) error {
 
-	if value < OFF {
-		value = OFF
-	} else if value > ON {
-		value = ON
-	}
+	value = clamp(value, OFF, ON)
 
 	data := fmt.Sprintf("%s=%f\n", p.Pin, value)
 
@@ -43,11 +39,6 @@ func (p *pwmPin) Set(value float32) error {
 	defer f.Close()
 
 	_, err = f.WriteString(data)
-	if err != nil {
-		return err
-	}
-
-	err = f.Sync()
 	if err != nil {
 		return err
 	}
