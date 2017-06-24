@@ -26,8 +26,8 @@ func (h HSI) Add(addend HSI) HSI {
 	const HueMax = 360
 
 	h.Hue += addend.Hue
-	h.Saturation = clamp(addend.Saturation+h.Saturation, 0, 1)
-	h.Intensity = clamp(addend.Intensity+h.Intensity, 0, 1)
+	h.Saturation = clamp(addend.Saturation+h.Saturation, OFF, ON)
+	h.Intensity = clamp(addend.Intensity+h.Intensity, OFF, ON)
 
 	if h.Hue > HueMax {
 		h.Hue -= HueMax

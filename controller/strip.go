@@ -68,7 +68,7 @@ func (s *Strip) TestStrip() error {
 
 	const testSeparationDuration = 250
 
-	println("Testing LED Strip")
+	fmt.Printf("Testing LED Strip %s", s.Name)
 
 	var test TestPatterns
 	test.Default()
@@ -90,8 +90,14 @@ func (s *Strip) TestStrip() error {
 	return nil
 }
 
-func (s *Strip) Off() error {
-	color := s.Color
-	color.Intensity = 0
-	return s.SetColor(color)
+func (s *Strip) Stop() {
+	ps.Pub(true, s.Name)
+}
+
+func (s *Strip) StopChan() chan interface{} {
+	return ps.Sub(s.Name)
+}
+
+func (s *Strip) Unsub(ch chan interface{}) {
+	ps.Unsub(ch, s.Name)
 }

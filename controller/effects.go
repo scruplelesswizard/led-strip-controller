@@ -1,11 +1,25 @@
 package controller
 
-import "time"
+import (
+	"time"
 
-func (s *Strip) Rotate(stop chan bool) error {
+	"github.com/cskr/pubsub"
+)
+
+var ps *pubsub.PubSub
+
+func init() {
+	ps = pubsub.New(1)
+}
+
+func (s *Strip) Rotate() error {
+
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	d, _ := time.ParseDuration("50ms")
-	err := s.SetColor(HSI{Hue: 0, Saturation: 1, Intensity: 1})
+	err := s.SetColor(HSI{Hue: s.Color.Hue, Saturation: 1, Intensity: 1})
 	if err != nil {
 		return err
 	}
@@ -24,30 +38,44 @@ func (s *Strip) Rotate(stop chan bool) error {
 	}
 }
 
-func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
+func (s *Strip) Fade(color HSI, effectDuration time.Duration) error {
+
+	s.Stop()
+	return s.fade(color, effectDuration)
+
+}
+
+func (s *Strip) fade(color HSI, effectDuration time.Duration) error {
+
+	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	// calculate step duration and # of steps
 	stepDuration := time.Duration(20) * time.Millisecond
-	steps := float64(duration / stepDuration)
+	steps := float64(effectDuration / stepDuration)
 
 	// calculate differences
 
-	hsiDiff := s.Color.Difference(color)
+	s.OverrideOff(color)
+
+	diff := s.Color.Difference(color)
 
 	// calculate change per steps
 
-	hsiStep := HSI{
-		Hue:        hsiDiff.Hue / steps,
-		Saturation: hsiDiff.Saturation / steps,
-		Intensity:  hsiDiff.Intensity / steps,
+	changeStep := HSI{
+		Hue:        diff.Hue / steps,
+		Saturation: diff.Saturation / steps,
+		Intensity:  diff.Intensity / steps,
 	}
 
-	for step := 0; step <= int(steps); step++ {
+	stepCount := int(steps)
+
+	for step := 0; step <= stepCount; step++ {
 		select {
 		case <-stop:
 			return nil
 		default:
-			err := s.SetColor(s.Color.Add(hsiStep))
+			err := s.SetColor(s.Color.Add(changeStep))
 			if err != nil {
 				return err
 			}
@@ -63,39 +91,34 @@ func (s *Strip) Fade(color HSI, duration time.Duration, stop chan bool) error {
 	}
 
 	return nil
-
 }
 
-func (s *Strip) FadeBetween(a, b HSI, duration time.Duration, stop chan bool) error {
+func (s *Strip) FadeBetween(colors []HSI, effectDuration time.Duration) error {
 
-	err := s.Fade(a, duration/2, stop)
-	if err != nil {
-		return err
-	}
-
-	if <-stop {
-		return nil
-	}
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
 
 	for {
-		switch {
-		case <-stop:
-			return nil
-		default:
-			err = s.Fade(b, duration/2, stop)
-			if err != nil {
-				return err
-			}
-			err = s.Fade(a, duration/2, stop)
-			if err != nil {
-				return err
+		for _, color := range colors {
+			select {
+			case <-stop:
+				return nil
+			default:
+				err := s.fade(color, effectDuration/2)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 }
 
-func (s *Strip) FadeOut(duration time.Duration, stop chan bool) error {
-	err := s.Fade(s.Color.Off(), duration, stop)
+func (s *Strip) FadeOut(effectDuration time.Duration) error {
+
+	s.Stop()
+
+	err := s.fade(s.Color.Off(), effectDuration)
 	if err != nil {
 		return err
 	}
@@ -104,17 +127,25 @@ func (s *Strip) FadeOut(duration time.Duration, stop chan bool) error {
 
 func (s *Strip) FlashBetween(c []HSI, d time.Duration) error {
 
-	// HACK: This will block. Use channel to break when required
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
+
 	for {
 		for _, color := range c {
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+			select {
+			case <-stop:
+				return nil
+			default:
+				err := s.SetColor(color)
+				if err != nil {
+					return err
+				}
+				time.Sleep(d)
 			}
-			time.Sleep(d)
 		}
 	}
-	return nil
+
 }
 
 func (s *Strip) Flash(c HSI, d time.Duration) error {
@@ -126,25 +157,54 @@ func (s *Strip) Flash(c HSI, d time.Duration) error {
 }
 
 func (s *Strip) Pulse(c HSI, d time.Duration) error {
-	var intensity float64
-	color := HSI{Hue: 0, Saturation: 1, Intensity: .5}
+
+	s.Stop()
+	stop := s.StopChan()
+	defer s.Unsub(stop)
+
+	maxIntensity := .4
+	minIntensity := .3
+	stepDistance := 0.001
+	sleepCycles := int64((maxIntensity - minIntensity) / stepDistance)
+	sleepDuration := time.Duration((d.Nanoseconds() / sleepCycles)) * time.Nanosecond
+
+	var i float64
+
 	for {
-		for intensity = .3; intensity < .4; intensity = intensity + 0.001 {
-			color.Intensity = intensity
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+		select {
+		case <-stop:
+			return nil
+		default:
+			for i = minIntensity; i < maxIntensity; i += stepDistance {
+				c.Intensity = i
+				err := s.SetColor(c)
+				if err != nil {
+					return err
+				}
+				time.Sleep(sleepDuration)
 			}
-			time.Sleep(d)
-		}
-		for intensity = .4; intensity > .3; intensity = intensity - 0.001 {
-			color.Intensity = intensity
-			err := s.SetColor(color)
-			if err != nil {
-				return err
+			for i = maxIntensity; i > minIntensity; i -= stepDistance {
+				c.Intensity = i
+				err := s.SetColor(c)
+				if err != nil {
+					return err
+				}
+				time.Sleep(sleepDuration * 2)
 			}
-			time.Sleep(d * 2)
 		}
 	}
-	return nil
+}
+
+func (s *Strip) Off() error {
+	s.Stop()
+	color := s.Color
+	color.Intensity = 0
+	return s.SetColor(color)
+}
+
+func (s *Strip) OverrideOff(color HSI) {
+	if s.Color.Intensity == 0 {
+		s.Color.Hue = color.Hue
+		s.Color.Saturation = color.Saturation
+	}
 }

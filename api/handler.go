@@ -1,32 +1,230 @@
 package api
 
 import (
-	"goji.io"
-	"goji.io/pat"
-	"net/http"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	"goji.io"
+
+	"github.com/chaosaffe/led-strip-controller/controller"
+
+	"goji.io/pat"
 	"golang.org/x/net/context"
 )
 
-func Register(r *goji.Mux) {
+var ss *controller.Strips
+
+type SingleColorRequest struct {
+	HSI             controller.HSI `json:"hsi"`
+	DurationSeconds int            `json:"durationSeconds"`
+}
+
+type MultiColorRequest struct {
+	HSI             []controller.HSI `json:"hsi"`
+	DurationSeconds int              `json:"durationSeconds"`
+}
+
+type DurationOnlyRequest struct {
+	DurationSeconds int `json:"durationSeconds"`
+}
+
+func Register(r *goji.Mux, s *controller.Strips) {
+
+	ss = s
+
 	r.HandleFuncC(pat.Get("/ping"), ping)
 
-	r.HandleFuncC(pat.Get("/strips"), ping)
-	r.HandleFuncC(pat.Get("/strip/:id"), ping)
+	r.HandleFuncC(pat.Get("/strips"), listStrips)
+	r.HandleFuncC(pat.Get("/strips/:id"), ping)
 
-	r.HandleFuncC(pat.Get("/strip/:id/effects"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/off"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/fade"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/fadeBetween"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/fadeOut"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/flashBetween"), ping)
-	r.HandleFuncC(pat.Post("/strip/:id/effect/flash"), ping)
+	r.HandleFuncC(pat.Get("/strips/:id/effects"), listEffects)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/off"), off)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/fade"), fade)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/fade-between"), fadeBetween)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/fade-out"), fadeOut)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/flash-between"), flashBetween)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/flash"), flash)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/rotate"), rotate)
+	r.HandleFuncC(pat.Post("/strips/:id/effect/pulse"), pulse)
 }
 
 func ping(c context.Context, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Pong!")
 }
 
-func getStrip(c context.Context, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Strip id=%s", pat.Param(c, "id"))
+func listStrips(c context.Context, w http.ResponseWriter, r *http.Request) {
+	// TODO: List available strips
+	fmt.Fprint(w, "Pong!")
+}
+
+func listEffects(c context.Context, w http.ResponseWriter, r *http.Request) {
+	// TODO: List avaliable effects
+	fmt.Fprint(w, "Pong!")
+}
+
+func off(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+	s.Off()
+}
+
+func rotate(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+	go s.Rotate()
+}
+
+func fade(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req SingleColorRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.Fade(req.HSI, d)
+}
+
+func fadeOut(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req DurationOnlyRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.FadeOut(d)
+}
+
+func flash(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req SingleColorRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.Flash(req.HSI, d)
+}
+
+func pulse(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req SingleColorRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.Pulse(req.HSI, d)
+}
+
+func fadeBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req MultiColorRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.FadeBetween(req.HSI, d)
+}
+
+func flashBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	var req MultiColorRequest
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	err = decoder.Decode(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(req)
+
+	d := time.Duration(req.DurationSeconds) * time.Second
+
+	go s.FlashBetween(req.HSI, d)
 }
