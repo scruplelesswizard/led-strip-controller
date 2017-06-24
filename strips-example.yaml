@@ -1,5 +1,5 @@
 strips:
-  - name: "Bed"
+  - name: "example"
     redPin: 17
     greenPin: 22
     bluePin: 24
