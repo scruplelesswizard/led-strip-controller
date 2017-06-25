@@ -54,6 +54,10 @@ func (s *Strip) fade(color HSI, d time.Duration) error {
 	// calculate step duration and # of steps
 	s.OverrideOff(color)
 
+	if s.Color == color {
+		return nil
+	}
+
 	diff := s.Color.Difference(color)
 
 	steps := math.Max(diff.Hue, math.Max(diff.Intensity, diff.Saturation))
