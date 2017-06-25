@@ -60,7 +60,7 @@ func (s *Strip) fade(color HSI, d time.Duration) error {
 
 	diff := s.Color.Difference(color)
 
-	steps := math.Max(diff.Hue, math.Max(diff.Intensity*255, diff.Saturation*255))
+	steps := math.Max(math.Abs(diff.Hue), math.Max(diff.Intensity*255, diff.Saturation*255))
 
 	stepDuration := time.Duration((d.Nanoseconds() / int64(steps))) * time.Nanosecond
 
