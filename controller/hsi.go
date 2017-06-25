@@ -41,6 +41,10 @@ func (h HSI) Add(addend HSI) HSI {
 
 func (h HSI) Difference(b HSI) HSI {
 
+	if b.Hue == 0 {
+		b.Hue = 360
+	}
+
 	hDiff := b.Hue - h.Hue
 	sDiff := b.Saturation - h.Saturation
 	iDiff := b.Intensity - h.Intensity
