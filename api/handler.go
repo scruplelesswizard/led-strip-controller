@@ -35,8 +35,6 @@ func Register(r *goji.Mux, s *controller.Strips) {
 
 	ss = s
 
-	r.HandleFuncC(pat.Get("/ping"), ping)
-
 	r.HandleFuncC(pat.Get("/strips"), listStrips)
 	r.HandleFuncC(pat.Get("/strips/:id"), ping)
 
@@ -92,8 +90,6 @@ func rotate(c context.Context, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println(req)
-
 	d := time.Duration(req.DurationSeconds) * time.Second
 
 	go s.Rotate(d)
@@ -115,8 +111,6 @@ func fade(c context.Context, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(req)
 
 	d := time.Duration(req.DurationSeconds) * time.Second
 
@@ -140,8 +134,6 @@ func fadeOut(c context.Context, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println(req)
-
 	d := time.Duration(req.DurationSeconds) * time.Second
 
 	go s.FadeOut(d)
@@ -163,8 +155,6 @@ func flash(c context.Context, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(req)
 
 	d := time.Duration(req.DurationSeconds) * time.Second
 
@@ -188,8 +178,6 @@ func pulse(c context.Context, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println(req)
-
 	d := time.Duration(req.DurationSeconds) * time.Second
 
 	go s.Pulse(req.HSI, d)
@@ -212,8 +200,6 @@ func fadeBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println(req)
-
 	d := time.Duration(req.DurationSeconds) * time.Second
 
 	go s.FadeBetween(req.HSI, d)
@@ -235,8 +221,6 @@ func flashBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(req)
 
 	d := time.Duration(req.DurationSeconds) * time.Second
 
