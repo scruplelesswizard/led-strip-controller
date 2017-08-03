@@ -5,9 +5,9 @@ import "math"
 // Based on http://blog.saikoled.com/post/43693602826/why-every-led-light-should-be-using-hsi
 
 type HSI struct {
-	Hue        float64
-	Saturation float64
-	Intensity  float64
+	Hue        float64 `json:"hue"`
+	Saturation float64 `json:"saturation"`
+	Intensity  float64 `json:"intensity"`
 }
 
 const HueRed = 0
