@@ -60,9 +60,22 @@ func listStrips(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 }
 
-func listStrips(c context.Context, w http.ResponseWriter, r *http.Request) {
-	// TODO: List available strips
-	fmt.Fprint(w, "Pong!")
+func getStrip(c context.Context, w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(c, "id")
+	s, err := ss.GetStrip(name)
+	if err != nil {
+		log.Printf("Could not use strip '%s': %s", name, err)
+		return
+	}
+
+	sJSON, err := json.Marshal(s)
+	if err != nil {
+		r.Response.StatusCode = 500
+		return
+	}
+
+	fmt.Fprint(w, string(sJSON))
+
 }
 
 func listEffects(c context.Context, w http.ResponseWriter, r *http.Request) {
