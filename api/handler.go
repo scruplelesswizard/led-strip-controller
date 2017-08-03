@@ -36,8 +36,7 @@ func Register(r *goji.Mux, s *controller.Strips) {
 	ss = s
 
 	r.HandleFuncC(pat.Get("/strips"), listStrips)
-	r.HandleFuncC(pat.Get("/strips/:id"), ping)
-
+	r.HandleFuncC(pat.Get("/strips/:id"), getStrip)
 	r.HandleFuncC(pat.Get("/strips/:id/effects"), listEffects)
 	r.HandleFuncC(pat.Post("/strips/:id/effect/off"), off)
 	r.HandleFuncC(pat.Post("/strips/:id/effect/fade"), fade)
@@ -49,8 +48,16 @@ func Register(r *goji.Mux, s *controller.Strips) {
 	r.HandleFuncC(pat.Post("/strips/:id/effect/pulse"), pulse)
 }
 
-func ping(c context.Context, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Pong!")
+func listStrips(c context.Context, w http.ResponseWriter, r *http.Request) {
+
+	sJSON, err := json.Marshal(ss)
+	if err != nil {
+		r.Response.StatusCode = 500
+		return
+	}
+
+	fmt.Fprint(w, string(sJSON))
+
 }
 
 func listStrips(c context.Context, w http.ResponseWriter, r *http.Request) {
