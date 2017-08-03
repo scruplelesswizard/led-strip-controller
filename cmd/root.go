@@ -37,8 +37,7 @@ var RootCmd = &cobra.Command{
 	Long:  `Does stuff`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		path := "./strips-example.yaml"
-		s := config.BuildStrips(path)
+		s := config.BuildStrips(stripFile)
 
 		mux := goji.NewMux()
 		api.Register(mux, s)

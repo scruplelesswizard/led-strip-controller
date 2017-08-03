@@ -30,8 +30,7 @@ var teststripCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Initiating Strip")
 
-		path := "./strips-example.yaml"
-		s := config.BuildStrips(path)
+		s := config.BuildStrips(stripFile)
 
 		for _, strip := range *s {
 			err := strip.TestStrip()
