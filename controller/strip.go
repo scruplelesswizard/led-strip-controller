@@ -6,8 +6,8 @@ import (
 )
 
 type Strip struct {
-	Name  string
-	Color HSI
+	Name  string `json:"name"`
+	Color HSI    `json:"hsi"`
 	rPin  pwmPin
 	gPin  pwmPin
 	bPin  pwmPin
