@@ -37,10 +37,15 @@ var RootCmd = &cobra.Command{
 	Long:  `Does stuff`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		s := config.BuildStrips(stripFile)
+		ss := config.BuildStrips(stripFile)
+		defer func() {
+			ss.AllOff()
+		}()
+
+		ss.AllOff()
 
 		mux := goji.NewMux()
-		api.Register(mux, s)
+		api.Register(mux, ss)
 		http.ListenAndServe(":8000", mux)
 
 	},
