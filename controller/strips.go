@@ -18,3 +18,11 @@ func (sCol *Strips) GetStrip(name string) (*Strip, error) {
 
 	return nil, fmt.Errorf("Strip with name %s was not found", name)
 }
+
+func (sCol *Strips) AllOff() {
+
+	for _, s := range *sCol {
+		s.Off()
+	}
+
+}
