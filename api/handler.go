@@ -20,18 +20,18 @@ var ss *controller.Strips
 // TODO: validate request
 type SingleColorRequest struct {
 	HSI             controller.HSI `json:"hsi"`
-	DurationSeconds int            `json:"durationSeconds"`
+	DurationSeconds float64        `json:"durationSeconds"`
 }
 
 // TODO: validate request
 type MultiColorRequest struct {
 	HSI             []controller.HSI `json:"hsi"`
-	DurationSeconds int              `json:"durationSeconds"`
+	DurationSeconds float64          `json:"durationSeconds"`
 }
 
 // TODO: validate request
 type DurationOnlyRequest struct {
-	DurationSeconds int `json:"durationSeconds"`
+	DurationSeconds float64 `json:"durationSeconds"`
 }
 
 func Register(r *goji.Mux, s *controller.Strips) {
