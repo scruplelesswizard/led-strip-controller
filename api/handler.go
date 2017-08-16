@@ -68,6 +68,7 @@ func getStrip(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -91,6 +92,7 @@ func off(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 	s.Off()
@@ -101,6 +103,7 @@ func rotate(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -110,7 +113,9 @@ func rotate(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -123,6 +128,7 @@ func fade(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -132,7 +138,9 @@ func fade(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -145,6 +153,7 @@ func fadeOut(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -154,7 +163,9 @@ func fadeOut(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -167,6 +178,7 @@ func flash(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -176,7 +188,9 @@ func flash(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -189,6 +203,7 @@ func pulse(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -198,7 +213,9 @@ func pulse(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -211,6 +228,7 @@ func fadeBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -220,7 +238,9 @@ func fadeBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
@@ -233,6 +253,7 @@ func flashBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 	s, err := ss.GetStrip(name)
 	if err != nil {
 		log.Printf("Could not use strip '%s': %s", name, err)
+		r.Response.StatusCode = 404
 		return
 	}
 
@@ -242,7 +263,9 @@ func flashBetween(c context.Context, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err = decoder.Decode(&req)
 	if err != nil {
-		panic(err)
+		r.Response.StatusCode = 400
+		log.Printf("Could not decode request for strip '%s': %s", name, err)
+		return
 	}
 
 	d := time.Duration(req.DurationSeconds) * time.Second
