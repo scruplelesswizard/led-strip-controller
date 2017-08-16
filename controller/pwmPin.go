@@ -30,22 +30,20 @@ func (p *pwmPin) Set(value float64) error {
 
 	value = clamp(value, OFF, ON)
 
-	if value != p.Value {
-		data := fmt.Sprintf("%s=%f\n", p.Pin, value)
+	data := fmt.Sprintf("%s=%f\n", p.Pin, value)
 
-		f, err := os.OpenFile("/dev/pi-blaster", os.O_WRONLY, 0666)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		_, err = f.WriteString(data)
-		if err != nil {
-			return err
-		}
-
-		p.Value = value
+	f, err := os.OpenFile("/dev/pi-blaster", os.O_WRONLY, 0666)
+	if err != nil {
+		return err
 	}
+	defer f.Close()
+
+	_, err = f.WriteString(data)
+	if err != nil {
+		return err
+	}
+
+	p.Value = value
 
 	return nil
 }
