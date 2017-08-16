@@ -42,8 +42,6 @@ var RootCmd = &cobra.Command{
 			ss.AllOff()
 		}()
 
-		ss.AllOff()
-
 		mux := goji.NewMux()
 		api.Register(mux, ss)
 		http.ListenAndServe(":8000", mux)
