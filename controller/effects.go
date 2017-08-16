@@ -49,19 +49,19 @@ func (s *Strip) Fade(color HSI, effectDuration time.Duration) error {
 
 func (s *Strip) fade(color HSI, d time.Duration) error {
 
+	if s.Color == color {
+		return nil
+	}
+
 	stop := s.StopChan()
 	defer s.Unsub(stop)
 
 	// calculate step duration and # of steps
 	s.OverrideOff(color)
 
-	if s.Color == color {
-		return nil
-	}
-
 	diff := s.Color.Difference(color)
-
-	steps := math.Max(math.Abs(diff.Hue), math.Max(diff.Intensity*255, diff.Saturation*255))
+	// div by zero?
+	steps := math.Max(math.Abs(diff.Hue), math.Max(math.Abs(diff.Intensity*255), math.Abs(diff.Saturation*255)))
 
 	stepDuration := time.Duration((d.Nanoseconds() / int64(steps))) * time.Nanosecond
 
