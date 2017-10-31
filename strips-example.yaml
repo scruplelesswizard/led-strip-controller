@@ -2,4 +2,4 @@ strips:
   - name: "example"
     redPin: 17
     greenPin: 22
-    bluePin: 24
+    bluePin: 27
